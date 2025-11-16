@@ -5,6 +5,9 @@ from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
+from tavily import TavilyClient
+
+tavily = TavilyClient()
 
 @tool
 def search(query: str) -> str:
@@ -16,9 +19,9 @@ def search(query: str) -> str:
         The search result
     """
     print(f"Searching for {query}")
-    return "Tokyo weather is sunny"
+    return tavily.search(query=query)
 
-llm = ChatOpenAI("gpt-5-nano")
+llm = ChatOpenAI(model="gpt-5")
 tools = [search]
 agent = create_agent(model=llm, tools=tools)
 
