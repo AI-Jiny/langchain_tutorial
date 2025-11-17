@@ -1,19 +1,29 @@
 from dotenv import load_dotenv
 
 load_dotenv()
+
+from langchain_classic import hub
+from langchain_classic.agents import AgentExecutor
+from langchain_classic.agents import create_react_agent
 from langchain.agents import create_agent
 from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 from langchain_tavily import TavilySearch
 
-llm = ChatOpenAI(model="gpt-5-nano")
+llm = ChatOpenAI(model="gpt-4")
 tools = [TavilySearch()]
-agent = create_agent(model=llm, tools=tools)
+react_prompt = hub.pull("hwchase17/react")
+agent = create_react_agent(llm=llm, tools=tools, prompt= react_prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+chain = agent_executor
 
 def main():
-    print("Hello from langchain-tutorial!")
-    result = agent.invoke({"messages":HumanMessage(content="What is the weather in Tokyo?")})
+    result = chain.invoke(
+        input={
+            "input" : "search for 3 job postings for an mlops engineer using langchain in the 판교,korea on jobkorea and list their details",
+        }
+    )
     print(result)
 
 if __name__ == "__main__":
